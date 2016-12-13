@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#02B3BA">
+
+    <!-- <com.ui.anynew.uicomponents.ui.CircleProgress
+         android:visibility="gone"
+         android:id="@+id/mCp"
+         android:layout_width="200dp"
+         android:layout_height="200dp"
+         android:padding="5dp"
+         android:layout_centerInParent="true"
+         app:progressBackColor="@color/colorAccent"
+         app:progressWidth="20"
+         app:textColor="#321456"
+         app:textSize="20sp" />-->
+
+    <com.ui.anynew.uicomponents.ui.CreditSesameRingView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:padding="10dp"
+        android:visibility="gone"
+        android:id="@+id/creditSesameRingView"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <com.ui.anynew.uicomponents.ui.TestView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:paddingTop="10dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/testView" />
+
+</RelativeLayout>
