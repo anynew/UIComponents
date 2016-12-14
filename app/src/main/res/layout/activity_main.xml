@@ -22,17 +22,8 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:padding="10dp"
-        android:visibility="gone"
         android:id="@+id/creditSesameRingView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
-
-    <com.ui.anynew.uicomponents.ui.TestView
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:paddingTop="10dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/testView" />
 
 </RelativeLayout>
