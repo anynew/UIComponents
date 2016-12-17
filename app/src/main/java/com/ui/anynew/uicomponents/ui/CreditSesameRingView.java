@@ -1,7 +1,9 @@
 package com.ui.anynew.uicomponents.ui;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -107,7 +109,7 @@ public class CreditSesameRingView extends View {
         wwPaint.setAntiAlias(true);
         wwPaint.setColor(Color.WHITE);
         wwPaint.setStyle(Paint.Style.STROKE);
-        wwPaint.setStrokeWidth(10);
+        wwPaint.setStrokeWidth(5);
 
         nPaint = new Paint();
         nPaint.setAntiAlias(true);
@@ -163,6 +165,7 @@ public class CreditSesameRingView extends View {
         mBitmapPaint.setStyle(Paint.Style.FILL);
         mBitmapPaint.setColor(Color.WHITE);
         mBitmapPaint.setAntiAlias(true);
+
         cir_location = new float[2];
     }
 
@@ -200,14 +203,14 @@ public class CreditSesameRingView extends View {
          */
         //将要绘制的区域
         RectF rectF = new RectF(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
-        Log.e("外环", "RectF: " + getPaddingLeft());
+//        Log.e("外环", "RectF: " + getPaddingLeft());
         //绘制外层圆环
         canvas.drawArc(rectF, -195, 210, false, wPaint);     // sweep area 180 + abs(-195) * 2
 
         //内环间距
         float distance = 30;
         RectF rectnF = new RectF(getPaddingLeft() + distance, getPaddingTop() + distance, getWidth() - getPaddingRight() - distance, getHeight() - getPaddingBottom() - distance);
-        Log.e("内环", "rectnF: " + getPaddingLeft());
+//        Log.e("内环", "rectnF: " + getPaddingLeft());
         //绘制内环
         canvas.drawArc(rectnF, -195, 210, false, nPaint);
 
@@ -222,12 +225,11 @@ public class CreditSesameRingView extends View {
         int startDst = (int) (getPaddingLeft() + distance - nPaint.getStrokeWidth() / 2);
 
         int endDst = (int) (startDst + nPaint.getStrokeWidth());
-        Log.e("TAG", "startDst: " + startDst + " getPaddingLeft: " + getPaddingLeft() + " distance: " + distance + " nPaint.getStrokeWidth(): " + nPaint.getStrokeWidth());
+//        Log.e("TAG", "startDst: " + startDst + " getPaddingLeft: " + getPaddingLeft() + " distance: " + distance + " nPaint.getStrokeWidth(): " + nPaint.getStrokeWidth());
         int endDsts = (int) (startDst + nPaint.getStrokeWidth() + 5);
         canvas.drawLine(radius, startDst, radius, endDst, ltPaint);
         for (int i = 0; i < 31; i++) {
             canvas.drawLine(radius, startDst, radius, endDst, ltPaint);
-            Log.e("TAG", "drawLine: " + radius + " startDst: " + startDst);
             canvas.rotate(7, radius, radius);
         }
         canvas.restore();
@@ -270,24 +272,15 @@ public class CreditSesameRingView extends View {
          * 绘制路径曲线
          */
         canvas.drawArc(rectF,-195,progress,false,wwPaint);
-     /*   Path path = new Path();
-        path.addArc(rectF,-195,progress);
-        PathMeasure pathMeasure = new PathMeasure();
-        pathMeasure.getPosTan(pathMeasure.getLength() * 1,cir_location,null);
-        mBitmapPaint.setColor(Color.WHITE);
-        canvas.drawCircle(cir_location[0],cir_location[1],8,mBitmapPaint);
-        canvas.drawCircle(cir_location[0],cir_location[1],8,mBitmapPaint);*/
-//        canvas.drawPath(path,mBitmapPaint);
-
 
         //绘制外环小圆点
         Path path = new Path();
         path.addArc(rectF, -195, progress);
         PathMeasure pathMeasure = new PathMeasure(path, false);
         pathMeasure.getPosTan(pathMeasure.getLength() * 1, cir_location, null);
-        mBitmapPaint.setColor(Color.WHITE);
+        mBitmapPaint.setColor(Color.GREEN);
         canvas.drawCircle(cir_location[0], cir_location[1], 8, mBitmapPaint);
-//        canvas.drawCircle(cir_location[0], cir_location[1], 8, mBitmapPaint);
+        Log.e("Tag", "cir_location:[0] "+ cir_location[0] + " cir_location[1] :" + cir_location[1] );
     }
 
     // 设置信用等级350~950之间
@@ -338,6 +331,7 @@ public class CreditSesameRingView extends View {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
 
                 progress = (float) valueAnimator.getAnimatedValue();
+                Log.e("progress", "onAnimationUpdate: "+ progress);
                 postInvalidate();
             }
         });
@@ -357,6 +351,7 @@ public class CreditSesameRingView extends View {
         });
         mNumAnim.start();
     }
+
 
     /**
      * 获取当前时间
