@@ -13,7 +13,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.CycleInterpolator;
 import android.view.animation.LinearInterpolator;
 
 /**
@@ -40,6 +42,7 @@ public class TextView extends View {
     private PathMeasure mPathMeasure;
     private float length;
     private DashPathEffect mEffect;
+    private Path nPath;
 
     public TextView(Context context) {
         this(context, null);
@@ -61,62 +64,60 @@ public class TextView extends View {
         cir_location = new float[2];
 
 
-        mPath = new Path();
-        mPath.reset();
-        mPath.moveTo(250, 250);
+       /* mPath.moveTo(250, 250);
         mPath.lineTo(450, 250);
         mPath.lineTo(550, 380);
         mPath.lineTo(450, 510);
         mPath.lineTo(250, 510);
         mPath.lineTo(150, 380);
-        mPath.close();
+        mPath.close();*/
 
-//        mPath.lineTo(400, 300);
-//        mPath.close();
-//        mPath.addCircle(300,300,150, Path.Direction.CW);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(5);
 
-        mPathMeasure = new PathMeasure(mPath, false);
 
-        length = mPathMeasure.getLength();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        mPath = new Path();
+        RectF rectF = new RectF(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+        mPath.addOval(rectF, Path.Direction.CCW);
+        mPathMeasure = new PathMeasure(mPath, false);
+        length = mPathMeasure.getLength();
         canvas.drawPath(mPath, mPaint);
-      /*  Path path = new Path();
+     /*   Path path = new Path();
         path.moveTo(300, 300);
         path.lineTo(300 + progress,300+ progress);
 
-        canvas.drawPath(path, basePaint);
-        PathMeasure pathMeasure = new PathMeasure(path, false);
+        canvas.drawPath(path, basePaint);*/
+        PathMeasure pathMeasure = new PathMeasure(mPath, false);
         pathMeasure.getPosTan(pathMeasure.getLength(), cir_location, null);
         canvas.drawCircle(cir_location[0], cir_location[1], 8, tPaint);
-        Log.e("TAG", "cir_location[0]: "+ cir_location[0]+ " cir_location[1] :" + cir_location[1]);*/
+
+        Log.e("TAG", "cir_location[0]: " + cir_location[0] + " cir_location[1] :" + cir_location[1]);
 
     }
 
     public void startAnim() {
-        ValueAnimator animator = ValueAnimator.ofFloat(1,0);
-        animator.setDuration(4000);
-        animator.setInterpolator(new LinearInterpolator());
+        ValueAnimator animator = ValueAnimator.ofFloat(1, 0);
+        animator.setDuration(3000);
+        animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 progress = (float) animation.getAnimatedValue();
-                mEffect = new DashPathEffect(new float[]{length, length},progress * length);
+                mEffect = new DashPathEffect(new float[]{length, length}, progress * length);
                 mPaint.setPathEffect(mEffect);
                 postInvalidate();
                 Log.e("TAG", "progress value is " + progress);
             }
         });
         animator.start();
-
-
     }
 }

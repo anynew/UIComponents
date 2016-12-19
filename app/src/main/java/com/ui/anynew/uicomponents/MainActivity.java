@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_main);
 //        mCreditSesameRingView = (CreditSesameRingView)findViewById(R.id.creditSesameRingView);
 //        mCreditSesameRingView.setSesameValues(600);
-        testView = (TextView)findViewById(R.id.textView);
-        testView.startAnim();
+//        testView = (TextView)findViewById(R.id.textView);
+//        testView.startAnim();
     }
 }
