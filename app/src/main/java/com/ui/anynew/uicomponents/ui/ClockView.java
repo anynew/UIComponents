@@ -161,7 +161,7 @@ public class ClockView extends View {
         for (int i = 0; i < 60; i++) {
             canvas.drawLine(radius, getPaddingTop(), radius, getPaddingTop() + sacleLength - 10, mLscalePaint);
             canvas.rotate(6, radius, radius);
-        }
+        } //
         canvas.restore();
         canvas.save();
 
