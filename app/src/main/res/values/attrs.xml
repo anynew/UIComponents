@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="CreditSesameRingView">
+    <declare-styleable name="ClockView">
+        <attr name="CircleColor" format="color"></attr>
+        <attr name="CircleWidth" format="dimension"></attr>
+        <attr name="ScaleColor" format="color"></attr>
+        <attr name="ScaleWidth" format="dimension"></attr>
+        <attr name="ScaleLength" format="dimension"></attr>
+        <attr name="PointColor" format="color"></attr>
     </declare-styleable>
 </resources>

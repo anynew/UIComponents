@@ -54,7 +54,6 @@ public class HeartView extends View {
 
         nPaint = new Paint();
         nPaint.setStyle(Paint.Style.STROKE);
-        nPaint.setStrokeWidth(8);
         nPaint.setColor(Color.BLUE);
 
         mPath = new Path();
@@ -71,8 +70,8 @@ public class HeartView extends View {
         super.onDraw(canvas);
         canvas.drawColor(Color.WHITE);
         canvas.drawPath(mPath, mPaint);
-        canvas.drawCircle(RIGHT_CONTROL_POINT[0], RIGHT_CONTROL_POINT[1], 5, mPaint);
-        canvas.drawCircle(LEFT_CONTROL_POINT[0], LEFT_CONTROL_POINT[1], 5, mPaint);
+//        canvas.drawCircle(RIGHT_CONTROL_POINT[0], RIGHT_CONTROL_POINT[1], 5, mPaint);
+//        canvas.drawCircle(LEFT_CONTROL_POINT[0], LEFT_CONTROL_POINT[1], 5, mPaint);
 
         canvas.drawCircle(mCurrentPosition[0],mCurrentPosition[1],8,nPaint);
     }

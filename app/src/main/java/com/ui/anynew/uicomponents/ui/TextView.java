@@ -58,12 +58,7 @@ public class TextView extends View {
 
         mPath = new Path();
         mPath.moveTo(250, 250);
-        mPath.lineTo(450, 250);
-        mPath.lineTo(550, 380);
-        mPath.lineTo(450, 510);
-        mPath.lineTo(250, 510);
-        mPath.lineTo(150, 380);
-        mPath.close();
+//        mPath.quadTo(250,250);
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);

@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     android:orientation="vertical">
 
     <com.ui.anynew.uicomponents.ui.TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <com.ui.anynew.uicomponents.ui.HeartView
-        android:layout_gravity="center"
+        android:id="@+id/heartView"
         android:layout_width="300dp"
-        android:visibility="gone"
         android:layout_height="300dp"
-        android:id="@+id/heartView" />
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <com.ui.anynew.uicomponents.ui.ClockView
+        android:id="@+id/clockView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:padding="15dp"
+        app:CircleColor="@color/colorPrimary"
+        app:CircleWidth="1dp"
+        app:ScaleColor="@color/colorPrimary"
+        app:ScaleLength="10dp"
+        app:ScaleWidth="3dp" />
 
 </LinearLayout>
