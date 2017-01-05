@@ -331,7 +331,7 @@ public class CreditSesameRingView extends View {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
 
                 progress = (float) valueAnimator.getAnimatedValue();
-                Log.e("progress", "onAnimationUpdate: "+ progress);
+//                Log.e("progress", "onAnimationUpdate: "+ progress);
                 postInvalidate();
             }
         });

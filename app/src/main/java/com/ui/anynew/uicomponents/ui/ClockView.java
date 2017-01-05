@@ -9,56 +9,97 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.RectF;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
 import com.ui.anynew.uicomponents.R;
+
+import java.util.Arrays;
+import java.util.Calendar;
 
 /**
  * Created by anynew on 2017/1/4.
  */
 
 public class ClockView extends View {
-    //圆盘的颜色
+    /**
+     * 圆盘的颜色
+     */
     private Paint mCirclePaint;
-    //大刻度画笔
+    /**
+     * 大刻度画笔
+     */
     private Paint mScalePaint;
-    //小刻度画笔
+    /**
+     * 小刻度画笔
+     */
     private Paint mLscalePaint;
-    //指针画笔
-    private Paint mPointerPaint;
-    //圆盘颜色
+    /**
+     * 秒针画笔
+     */
+    private Paint mSecPtrPaint;
+    /**
+     * 分针画笔
+     */
+    private Paint mMinPtrPaint;
+    /**
+     * 时针画笔
+     */
+    private Paint mHorPtrPaint;
+    /**
+     * 表盘颜色
+     */
     private int mCircleColor;
-
+    /**
+     * 表盘宽度
+     */
     private int mCircleWidth;
-    //小刻度宽度
+    /**
+     * 小刻度宽度
+     */
     private int mLScaleWidth;
-
+    /**
+     * 刻度颜色
+     */
     private int mScaleColor;
-
+    /**
+     * 刻度宽度
+     */
     private int mScaleWidth;
-
+    /**
+     * 自身view的宽度和高度
+     */
     private int width, height;
-    //指针颜色
-    private int pointColor;
+    /**
+     * 时分秒针颜色
+     */
+    private int mSecPtrColor, mMinPtrColor, mHorPtrColor;
 
     private int defaultSize = 150; //默认大小
 
     private int radius; //半径
+    /**
+     * 时、分、秒针的长度
+     */
+    private float sacleHLength, sacleMLength, sacleSLength;
 
-    private float sacleLength;
-    private Runnable runnable;
-    private Handler mHandler;
-    private Path path;
-    private float progress = 0;
-    private float[]  cir_location ;
-    private PathMeasure pathMeasure;
+    private float progress_sec,progress_min,progress_hor;
+    /**
+     * 坐标变化数组
+     */
+    private float[] cirLocationSec = new float[2];
+    private float[] cirLocationMin = new float[2];
+    private float[] cirLocationHor = new float[2];
+    /**
+     * 时分秒三维数组
+     */
+    private float[] time;
 
+    private float[] degree;
+
+    private float[] d2t;
 
     public ClockView(Context context) {
         this(context, null);
@@ -77,13 +118,18 @@ public class ClockView extends View {
         mCircleWidth = ta.getDimensionPixelSize(R.styleable.ClockView_CircleWidth, 10);
         mScaleColor = ta.getColor(R.styleable.ClockView_ScaleColor, Color.WHITE);
         mScaleWidth = ta.getDimensionPixelSize(R.styleable.ClockView_ScaleWidth, 15);
-        sacleLength = ta.getDimensionPixelSize(R.styleable.ClockView_ScaleLength, 10);
-        pointColor = ta.getColor(R.styleable.ClockView_PointColor, Color.parseColor("#CC7832"));
+        sacleSLength = ta.getDimensionPixelSize(R.styleable.ClockView_ScaleLength, 10);
+
+        mSecPtrColor = ta.getColor(R.styleable.ClockView_SecPtrColor, Color.parseColor("#CC7832"));
+        mMinPtrColor = ta.getColor(R.styleable.ClockView_MinPtrColor, Color.parseColor("#2CB044"));
+        mHorPtrColor = ta.getColor(R.styleable.ClockView_HourPtrColor, Color.parseColor("#FFFFFF"));
         ta.recycle();
 
         mCirclePaint = new Paint();
         mScalePaint = new Paint();
-        mPointerPaint = new Paint();
+        mSecPtrPaint = new Paint();
+        mMinPtrPaint = new Paint();
+        mHorPtrPaint = new Paint();
         mLscalePaint = new Paint();
 
         mCirclePaint.setColor(mCircleColor);
@@ -101,23 +147,22 @@ public class ClockView extends View {
         mLscalePaint.setStyle(Paint.Style.STROKE);
         mLscalePaint.setStrokeWidth(2);
 
-        mPointerPaint.setAntiAlias(true);
-        mPointerPaint.setColor(pointColor);
-        mPointerPaint.setStyle(Paint.Style.STROKE);
-        mPointerPaint.setStrokeWidth(3);
+        mSecPtrPaint.setAntiAlias(true);
+        mSecPtrPaint.setColor(mSecPtrColor);
+        mSecPtrPaint.setStyle(Paint.Style.STROKE);
+        mSecPtrPaint.setStrokeWidth(3);
 
-        mHandler = new Handler();
+        mMinPtrPaint.setAntiAlias(true);
+        mMinPtrPaint.setColor(mMinPtrColor);
+        mMinPtrPaint.setStyle(Paint.Style.STROKE);
+        mMinPtrPaint.setStrokeWidth(6);
 
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                //线程中刷新界面
-                mHandler.postDelayed(this, 1000);
-                postInvalidate();
-                Log.e("Tag","run is called");
+        mHorPtrPaint.setAntiAlias(true);
+        mHorPtrPaint.setColor(mHorPtrColor);
+        mHorPtrPaint.setStyle(Paint.Style.STROKE);
+        mHorPtrPaint.setStrokeWidth(8);
 
-            }
-        };
+        d2t = degrees2sec();
 
     }
 
@@ -152,44 +197,117 @@ public class ClockView extends View {
         //刻度
         canvas.save();
         for (int i = 0; i < 12; i++) {
-            canvas.drawLine(radius, getPaddingTop(), radius, getPaddingTop() + sacleLength, mScalePaint);
+            canvas.drawLine(radius, getPaddingTop(), radius, getPaddingTop() + sacleSLength, mScalePaint);
             canvas.rotate(30, radius, radius);
         }
         canvas.restore();
         canvas.save();
         //绘制小刻度
         for (int i = 0; i < 60; i++) {
-            canvas.drawLine(radius, getPaddingTop(), radius, getPaddingTop() + sacleLength - 10, mLscalePaint);
+            canvas.drawLine(radius, getPaddingTop(), radius, getPaddingTop() + sacleSLength - 10, mLscalePaint);
             canvas.rotate(6, radius, radius);
-        } //
+
+        }
+        canvas.restore();
+
+        canvas.save();
+        Path pathSec = new Path();
+        pathSec.addArc(rectF, 0, progress_sec);
+        PathMeasure pathMeasureSec = new PathMeasure(pathSec, false);
+        pathMeasureSec.getPosTan(pathMeasureSec.getLength(), cirLocationSec, null);
+        canvas.rotate(d2t[0], radius, radius);
+        canvas.drawLine(radius, radius, cirLocationSec[0], cirLocationSec[1], mSecPtrPaint);
+        canvas.restore();
+
+        canvas.save();
+        Path pathMin = new Path();
+        pathMin.addArc(rectF, 0, progress_min);
+        PathMeasure pathMeasureMin = new PathMeasure(pathMin, false);
+        pathMeasureMin.getPosTan(pathMeasureMin.getLength(), cirLocationMin, null);
+        canvas.rotate(d2t[1], radius, radius);
+        canvas.drawLine(radius, radius, cirLocationMin[0], cirLocationMin[1], mMinPtrPaint);
+        canvas.restore();
+
+        canvas.save();
+        Path pathHor = new Path();
+        pathHor.addArc(rectF, 0, progress_hor);
+        PathMeasure pathMeasureHor = new PathMeasure(pathHor, false);
+        pathMeasureHor.getPosTan(pathMeasureHor.getLength(), cirLocationHor, null);
+        canvas.rotate(d2t[2], radius, radius);
+        canvas.drawLine(radius, radius, cirLocationHor[0], cirLocationHor[1], mHorPtrPaint);
         canvas.restore();
         canvas.save();
-
-        path = new Path();
-        path.moveTo(radius,radius);
-        path.addArc(rectF,0,progress);
-        pathMeasure = new PathMeasure(path,false);
-        pathMeasure.getPosTan(pathMeasure.getLength(),cir_location,null);
-        //绘制刻度笔
-        canvas.drawLine(radius, radius, radius + progress, getPaddingTop()+30 -progress, mPointerPaint);
-//        canvas.rotate(progress,radius,radius);
     }
 
-    public void startAnim(){
+    public void startAnim() {
 
-        ValueAnimator mAngleAnim = ValueAnimator.ofFloat(progress,360);
-        mAngleAnim.setInterpolator(new LinearInterpolator());
-        mAngleAnim.setDuration(60 * 1000);
-        mAngleAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        ValueAnimator mSecondAnim = ValueAnimator.ofFloat(progress_sec, 360);
+        mSecondAnim.setInterpolator(new LinearInterpolator());
+        mSecondAnim.setRepeatCount(Integer.MAX_VALUE);
+        mSecondAnim.setDuration(60 * 1000);
+        mSecondAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                progress = (float) animation.getAnimatedValue();
+                progress_sec = (float) animation.getAnimatedValue();
                 postInvalidate();
-                Log.e("progress", "onAnimationUpdate: "+ progress);
+                //Log.e("progress", "onAnimationUpdate: " + progress);
             }
         });
-        mAngleAnim.start();
+        mSecondAnim.start();
+
+        ValueAnimator mMinAnim = ValueAnimator.ofFloat(progress_min, 360);
+        mMinAnim.setInterpolator(new LinearInterpolator());
+        mMinAnim.setRepeatCount(Integer.MAX_VALUE);
+        mMinAnim.setDuration(60 * 60 * 1000);
+        mMinAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                progress_min = (float) animation.getAnimatedValue();
+                postInvalidate();
+//                Log.e("progress", "onAnimationUpdate: " + progress_min);
+            }
+        });
+        mMinAnim.start();
+
+        ValueAnimator mHorAnim = ValueAnimator.ofFloat(progress_hor, 360);
+        mHorAnim.setInterpolator(new LinearInterpolator());
+        mHorAnim.setRepeatCount(Integer.MAX_VALUE);
+        mHorAnim.setDuration(12 * 60 * 60 * 1000);
+        mHorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                progress_hor = (float) animation.getAnimatedValue();
+                postInvalidate();
+//                Log.e("progress", "onAnimationUpdate: " + progress_hor);
+            }
+        });
+        mHorAnim.start();
     }
 
+    /**
+     * 获取时分秒的数组
+     * @return
+     */
+    public float[] curTime() {
+        time = new float[3];
+        Calendar c = Calendar.getInstance();
+        time[0] = c.get(Calendar.SECOND);
+        time[1] = c.get(Calendar.MINUTE);
+        time[2] = c.get(Calendar.HOUR);
+//        Log.e("Time", "getCurrentSeconds: " + Arrays.toString(time));
+        return time;
+    }
 
+    /**
+     *
+     * @return 度数与时间的转换
+     */
+    public float[] degrees2sec() {
+        degree = new float[3];
+        degree[0] = (curTime()[0] / 15) * 90 - 90;  //秒的转换
+        degree[1] = (curTime()[1] / 15 ) * 90 - 90;  //分的转换
+        degree[2] = (curTime()[2] / 3) * 90 - 90;  //时的转换
+        Log.e("degrees2sec", "degrees2sec: "+ Arrays.toString(degree));
+        return degree;
+    }
 }

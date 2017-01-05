@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         clockView.startAnim();
 //        setContentView(R.layout.activity_main);
 //        mCreditSesameRingView = (CreditSesameRingView)findViewById(R.id.creditSesameRingView);
-//        mCreditSesameRingView.setSesameValues(600);
+//        mCreditSesameRingView.setSesameValues(750);
 //        testView = (TextView)findViewById(R.id.textView);
 //        testView.startAnim();
 //        heartView = (HeartView) findViewById(R.id.heartView);

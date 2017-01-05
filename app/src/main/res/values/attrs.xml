@@ -6,6 +6,8 @@
         <attr name="ScaleColor" format="color"></attr>
         <attr name="ScaleWidth" format="dimension"></attr>
         <attr name="ScaleLength" format="dimension"></attr>
-        <attr name="PointColor" format="color"></attr>
+        <attr name="HourPtrColor" format="color"></attr>
+        <attr name="MinPtrColor" format="color"></attr>
+        <attr name="SecPtrColor" format="color"></attr>
     </declare-styleable>
 </resources>
