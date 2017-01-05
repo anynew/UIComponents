@@ -112,6 +112,8 @@ public class ClockView extends View {
     public ClockView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        d2t = degrees2sec();
+
         TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ClockView, defStyleAttr, 0);
 
         mCircleColor = ta.getColor(R.styleable.ClockView_CircleColor, Color.CYAN);
@@ -162,7 +164,6 @@ public class ClockView extends View {
         mHorPtrPaint.setStyle(Paint.Style.STROKE);
         mHorPtrPaint.setStrokeWidth(8);
 
-        d2t = degrees2sec();
 
     }
 
@@ -191,8 +192,11 @@ public class ClockView extends View {
     @Override
     protected void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
+        float minDistance = 80;
         //确定表盘区域
-        RectF rectF = new RectF(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+        final RectF rectF =  new RectF(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+        final RectF rectFmin = new RectF(getPaddingLeft()+ minDistance, getPaddingTop()+minDistance, getWidth() - getPaddingRight()-minDistance, getHeight() - getPaddingBottom()-minDistance);
+        final RectF rectFhour = new RectF(getPaddingLeft()+ minDistance*3/2, getPaddingTop()+minDistance*3/2, getWidth() - getPaddingRight()-minDistance*3/2, getHeight() - getPaddingBottom()-minDistance*3/2);
         canvas.drawArc(rectF, 0, 360, false, mCirclePaint);
         //刻度
         canvas.save();
@@ -221,7 +225,7 @@ public class ClockView extends View {
 
         canvas.save();
         Path pathMin = new Path();
-        pathMin.addArc(rectF, 0, progress_min);
+        pathMin.addArc(rectFmin, 0, progress_min);
         PathMeasure pathMeasureMin = new PathMeasure(pathMin, false);
         pathMeasureMin.getPosTan(pathMeasureMin.getLength(), cirLocationMin, null);
         canvas.rotate(d2t[1], radius, radius);
@@ -230,9 +234,10 @@ public class ClockView extends View {
 
         canvas.save();
         Path pathHor = new Path();
-        pathHor.addArc(rectF, 0, progress_hor);
+        pathHor.addArc(rectFhour, 0, progress_hor);
         PathMeasure pathMeasureHor = new PathMeasure(pathHor, false);
         pathMeasureHor.getPosTan(pathMeasureHor.getLength(), cirLocationHor, null);
+//        canvas.rotate(-90, radius, radius);
         canvas.rotate(d2t[2], radius, radius);
         canvas.drawLine(radius, radius, cirLocationHor[0], cirLocationHor[1], mHorPtrPaint);
         canvas.restore();
@@ -294,7 +299,7 @@ public class ClockView extends View {
         time[0] = c.get(Calendar.SECOND);
         time[1] = c.get(Calendar.MINUTE);
         time[2] = c.get(Calendar.HOUR);
-//        Log.e("Time", "getCurrentSeconds: " + Arrays.toString(time));
+        Log.e("Time", "getCurrentSeconds: " + Arrays.toString(time));
         return time;
     }
 
