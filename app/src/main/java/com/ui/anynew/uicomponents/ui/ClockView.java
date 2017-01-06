@@ -48,6 +48,12 @@ public class ClockView extends View {
      * 时针画笔
      */
     private Paint mHorPtrPaint;
+
+    /**
+     *  文本画笔
+     */
+    private Paint txPaint;
+
     /**
      * 表盘颜色
      */
@@ -85,7 +91,11 @@ public class ClockView extends View {
      */
     private float sacleHLength, sacleMLength, sacleSLength;
 
-    private float progress_sec,progress_min,progress_hor;
+    private float progress_sec=1,progress_min=1,progress_hor=1;
+    /**
+     * 数字文本与表盘间距
+     */
+    private float txDistance = 55;
     /**
      * 坐标变化数组
      */
@@ -101,6 +111,10 @@ public class ClockView extends View {
 
     private float[] d2t;
 
+//    private String[] str = {"12","1","2","3","4","5","6","7","8","9","10","11"};
+
+    private String[] str = {"12","3","6","9"};
+
     public ClockView(Context context) {
         this(context, null);
     }
@@ -112,7 +126,7 @@ public class ClockView extends View {
     public ClockView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        d2t = degrees2sec();
+        d2t = time2degree();
 
         TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ClockView, defStyleAttr, 0);
 
@@ -162,9 +176,12 @@ public class ClockView extends View {
         mHorPtrPaint.setAntiAlias(true);
         mHorPtrPaint.setColor(mHorPtrColor);
         mHorPtrPaint.setStyle(Paint.Style.STROKE);
-        mHorPtrPaint.setStrokeWidth(8);
+        mHorPtrPaint.setStrokeWidth(6);
 
-
+        txPaint = new Paint();
+        txPaint.setAntiAlias(true);
+        txPaint.setColor(Color.WHITE);
+        txPaint.setTextSize(30);
     }
 
     @Override
@@ -215,7 +232,7 @@ public class ClockView extends View {
         canvas.restore();
 
         canvas.save();
-        Path pathSec = new Path();
+        final Path pathSec = new Path();
         pathSec.addArc(rectF, 0, progress_sec);
         PathMeasure pathMeasureSec = new PathMeasure(pathSec, false);
         pathMeasureSec.getPosTan(pathMeasureSec.getLength(), cirLocationSec, null);
@@ -224,7 +241,7 @@ public class ClockView extends View {
         canvas.restore();
 
         canvas.save();
-        Path pathMin = new Path();
+        final Path pathMin = new Path();
         pathMin.addArc(rectFmin, 0, progress_min);
         PathMeasure pathMeasureMin = new PathMeasure(pathMin, false);
         pathMeasureMin.getPosTan(pathMeasureMin.getLength(), cirLocationMin, null);
@@ -233,15 +250,42 @@ public class ClockView extends View {
         canvas.restore();
 
         canvas.save();
-        Path pathHor = new Path();
+        final Path pathHor = new Path();
         pathHor.addArc(rectFhour, 0, progress_hor);
         PathMeasure pathMeasureHor = new PathMeasure(pathHor, false);
         pathMeasureHor.getPosTan(pathMeasureHor.getLength(), cirLocationHor, null);
-//        canvas.rotate(-90, radius, radius);
         canvas.rotate(d2t[2], radius, radius);
         canvas.drawLine(radius, radius, cirLocationHor[0], cirLocationHor[1], mHorPtrPaint);
         canvas.restore();
+
         canvas.save();
+
+        drawNumber(canvas);
+
+
+    }
+
+    /**
+     * 绘制指针数字
+     * @param canvas
+     */
+    private void drawNumber(Canvas canvas) {
+     /*   for (int i = 0; i < str.length; i++) {
+            float textLen = txPaint.measureText(str[i]);
+            canvas.drawText(str[i],radius-textLen/2,getPaddingTop()+50,txPaint);
+            canvas.rotate(90,radius,radius);
+        }*/
+        float textLen_12 = txPaint.measureText(str[0]);
+        float textLen_3 = txPaint.measureText(str[1]);
+        float textLen_6 = txPaint.measureText(str[2]);
+        float textLen_9 = txPaint.measureText(str[3]);
+        float rd = height - getPaddingTop() * 2;
+        canvas.drawText(str[0],radius - textLen_12 / 2,getPaddingTop() + txDistance,txPaint);
+        canvas.drawText(str[1],width - txDistance - getPaddingLeft(),radius + textLen_3 / 2 ,txPaint );
+        canvas.drawText(str[2],radius - textLen_6 / 2, height - getPaddingTop() - txDistance*2/3,txPaint);
+        canvas.drawText(str[3],getPaddingLeft()+ txDistance*2/3 ,radius + textLen_9 / 2 ,txPaint );
+
+        Log.e("drawNumber", "getPaddingTop =  "+getPaddingTop() + " txDistance = "+txDistance + " height = "+ height + " radius = "+radius);
     }
 
     public void startAnim() {
@@ -255,7 +299,7 @@ public class ClockView extends View {
             public void onAnimationUpdate(ValueAnimator animation) {
                 progress_sec = (float) animation.getAnimatedValue();
                 postInvalidate();
-                //Log.e("progress", "onAnimationUpdate: " + progress);
+//                Log.e("progress", "onAnimationUpdate: " + progress);
             }
         });
         mSecondAnim.start();
@@ -263,7 +307,7 @@ public class ClockView extends View {
         ValueAnimator mMinAnim = ValueAnimator.ofFloat(progress_min, 360);
         mMinAnim.setInterpolator(new LinearInterpolator());
         mMinAnim.setRepeatCount(Integer.MAX_VALUE);
-        mMinAnim.setDuration(60 * 60 * 1000);
+        mMinAnim.setDuration( 60 * 60 * 1000);
         mMinAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -307,12 +351,13 @@ public class ClockView extends View {
      *
      * @return 度数与时间的转换
      */
-    public float[] degrees2sec() {
+    public float[] time2degree() {
         degree = new float[3];
-        degree[0] = (curTime()[0] / 15) * 90 - 90;  //秒的转换
-        degree[1] = (curTime()[1] / 15 ) * 90 - 90;  //分的转换
-        degree[2] = (curTime()[2] / 3) * 90 - 90;  //时的转换
-        Log.e("degrees2sec", "degrees2sec: "+ Arrays.toString(degree));
+        float[] curTime = curTime();
+        degree[0] = (curTime[0] / 15) * 90 - 90;  //秒的转换
+        degree[1] = (curTime[1] / 15 ) * 90 - 90;  //分的转换
+        degree[2] = ((curTime[2] * 60 + curTime[1] + curTime[0]/60 )/180) * 90 -90;  //时的转换
+        Log.e("time2degree", "time2degree: "+ Arrays.toString(degree));
         return degree;
     }
 }
