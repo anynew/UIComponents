@@ -25,11 +25,13 @@
         android:layout_height="300dp"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:padding="30dp"
+        android:padding="10dp"
+        app:LogoText="Anynew"
+        app:LogoTextDistance="50dp"
         app:CircleColor="@color/colorAccent"
-        app:CircleWidth="1dp"
+        app:CircleWidth="2dp"
         app:ScaleColor="@color/colorAccent"
-        app:ScaleLength="10dp"
+        app:ScaleLength="13dp"
         app:ScaleWidth="3dp" />
 
 </LinearLayout>

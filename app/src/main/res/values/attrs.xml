@@ -9,5 +9,7 @@
         <attr name="HourPtrColor" format="color"/>
         <attr name="MinPtrColor" format="color"/>
         <attr name="SecPtrColor" format="color"/>
+        <attr name="LogoText" format="string"/>
+        <attr name="LogoTextDistance" format="dimension"/>
     </declare-styleable>
 </resources>

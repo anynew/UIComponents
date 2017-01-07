@@ -3,11 +3,16 @@ package com.ui.anynew.uicomponents.ui;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -54,6 +59,14 @@ public class ClockView extends View {
      */
     private Paint txPaint;
 
+    /**
+     * logo文本
+     */
+    private Paint logoPaint;
+    /**
+    * logo文本距离
+    */
+    private float logoTextDistance;
     /**
      * 表盘颜色
      */
@@ -114,6 +127,8 @@ public class ClockView extends View {
 //    private String[] str = {"12","1","2","3","4","5","6","7","8","9","10","11"};
 
     private String[] str = {"12","3","6","9"};
+    private Paint mImgPaint;
+    private String logo;
 
     public ClockView(Context context) {
         this(context, null);
@@ -123,8 +138,11 @@ public class ClockView extends View {
         this(context, attrs, 0);
     }
 
+
     public ClockView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        disableHardwareRendering(this);
+        BlurMaskFilter bmf = new BlurMaskFilter(10, BlurMaskFilter.Blur.SOLID);
 
         d2t = time2degree();
 
@@ -135,6 +153,8 @@ public class ClockView extends View {
         mScaleColor = ta.getColor(R.styleable.ClockView_ScaleColor, Color.WHITE);
         mScaleWidth = ta.getDimensionPixelSize(R.styleable.ClockView_ScaleWidth, 15);
         sacleSLength = ta.getDimensionPixelSize(R.styleable.ClockView_ScaleLength, 10);
+        logo = ta.getString(R.styleable.ClockView_LogoText);
+        logoTextDistance = ta.getDimensionPixelSize(R.styleable.ClockView_LogoTextDistance,dp_px(10));
 
         mSecPtrColor = ta.getColor(R.styleable.ClockView_SecPtrColor, Color.parseColor("#CC7832"));
         mMinPtrColor = ta.getColor(R.styleable.ClockView_MinPtrColor, Color.parseColor("#2CB044"));
@@ -147,6 +167,10 @@ public class ClockView extends View {
         mMinPtrPaint = new Paint();
         mHorPtrPaint = new Paint();
         mLscalePaint = new Paint();
+        logoPaint = new Paint();
+
+        mImgPaint = new Paint();
+        mImgPaint.setAlpha(200);
 
         mCirclePaint.setColor(mCircleColor);
         mCirclePaint.setAntiAlias(true);
@@ -167,21 +191,32 @@ public class ClockView extends View {
         mSecPtrPaint.setColor(mSecPtrColor);
         mSecPtrPaint.setStyle(Paint.Style.STROKE);
         mSecPtrPaint.setStrokeWidth(3);
+        mSecPtrPaint.setMaskFilter(bmf);
+
 
         mMinPtrPaint.setAntiAlias(true);
         mMinPtrPaint.setColor(mMinPtrColor);
         mMinPtrPaint.setStyle(Paint.Style.STROKE);
         mMinPtrPaint.setStrokeWidth(6);
+        mMinPtrPaint.setMaskFilter(bmf);
+
 
         mHorPtrPaint.setAntiAlias(true);
         mHorPtrPaint.setColor(mHorPtrColor);
         mHorPtrPaint.setStyle(Paint.Style.STROKE);
         mHorPtrPaint.setStrokeWidth(6);
+        mHorPtrPaint.setMaskFilter(bmf);
+
 
         txPaint = new Paint();
         txPaint.setAntiAlias(true);
         txPaint.setColor(Color.WHITE);
         txPaint.setTextSize(30);
+
+        logoPaint = new Paint();
+        logoPaint.setAntiAlias(true);
+        logoPaint.setColor(Color.GRAY);
+        logoPaint.setTextSize(40);
     }
 
     @Override
@@ -209,12 +244,15 @@ public class ClockView extends View {
     @Override
     protected void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
+
+        drawBackgroundImage(canvas);
+
         float minDistance = 80;
         //确定表盘区域
         final RectF rectF =  new RectF(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
         final RectF rectFmin = new RectF(getPaddingLeft()+ minDistance, getPaddingTop()+minDistance, getWidth() - getPaddingRight()-minDistance, getHeight() - getPaddingBottom()-minDistance);
         final RectF rectFhour = new RectF(getPaddingLeft()+ minDistance*3/2, getPaddingTop()+minDistance*3/2, getWidth() - getPaddingRight()-minDistance*3/2, getHeight() - getPaddingBottom()-minDistance*3/2);
-        canvas.drawArc(rectF, 0, 360, false, mCirclePaint);
+//        canvas.drawArc(rectF, 0, 360, false, mCirclePaint);
         //刻度
         canvas.save();
         for (int i = 0; i < 12; i++) {
@@ -230,6 +268,9 @@ public class ClockView extends View {
 
         }
         canvas.restore();
+
+        float logoLength = logoPaint.measureText(logo);
+        canvas.drawText(logo,radius - logoLength / 2,getPaddingTop() + txDistance + logoTextDistance,logoPaint);
 
         canvas.save();
         final Path pathSec = new Path();
@@ -262,7 +303,21 @@ public class ClockView extends View {
 
         drawNumber(canvas);
 
+    }
 
+
+
+    /**
+     * 画表盘背景图
+     * @param canvas
+     */
+    private void drawBackgroundImage(Canvas canvas) {
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.mipmap.mickey_mouse);
+        Matrix matrix = new Matrix();
+        matrix.postScale(0.6f, 0.6f);
+        Bitmap dstbmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(),
+                matrix, true);
+        canvas.drawBitmap(dstbmp,radius*2/3,radius*2/3,mImgPaint);
     }
 
     /**
@@ -279,7 +334,6 @@ public class ClockView extends View {
         float textLen_3 = txPaint.measureText(str[1]);
         float textLen_6 = txPaint.measureText(str[2]);
         float textLen_9 = txPaint.measureText(str[3]);
-        float rd = height - getPaddingTop() * 2;
         canvas.drawText(str[0],radius - textLen_12 / 2,getPaddingTop() + txDistance,txPaint);
         canvas.drawText(str[1],width - txDistance - getPaddingLeft(),radius + textLen_3 / 2 ,txPaint );
         canvas.drawText(str[2],radius - textLen_6 / 2, height - getPaddingTop() - txDistance*2/3,txPaint);
@@ -359,5 +413,22 @@ public class ClockView extends View {
         degree[2] = ((curTime[2] * 60 + curTime[1] + curTime[0]/60 )/180) * 90 -90;  //时的转换
         Log.e("time2degree", "time2degree: "+ Arrays.toString(degree));
         return degree;
+    }
+    public static void disableHardwareRendering(View v) {
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            v.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+    }
+
+    /**
+     * dp转px
+     * @param values
+     * @return
+     */
+    public int dp_px(int values)
+    {
+
+        float density = getResources().getDisplayMetrics().density;
+        return (int) (values * density + 0.5f);
     }
 }
