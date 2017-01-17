@@ -22,9 +22,18 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:padding="10dp"
+        android:visibility="gone"
         android:id="@+id/creditSesameRingView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <com.ui.anynew.uicomponents.ui.DrawableLeft
+        android:padding="20dp"
+        android:visibility="visible"
+        android:layout_centerInParent="true"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:id="@+id/drawableLeft" />
 
 
 </RelativeLayout>

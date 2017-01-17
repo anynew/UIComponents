@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.ui.anynew.uicomponents.ui.CircleColorBar;
 import com.ui.anynew.uicomponents.ui.CircleProgress;
 import com.ui.anynew.uicomponents.ui.ClockView;
 import com.ui.anynew.uicomponents.ui.CreditSesameRingView;
@@ -17,13 +18,16 @@ public class MainActivity extends AppCompatActivity {
     private TextView testView;
     private HeartView heartView;
     private ClockView clockView;
+    private CircleColorBar circleColorBar ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_testview);
-        clockView = (ClockView)findViewById(R.id.clockView);
-        clockView.startAnim();
-//        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_testview);
+//        circleColorBar = (CircleColorBar)findViewById(R.id.mCircle);
+//        circleColorBar.startAnim();
+//        clockView = (ClockView)findViewById(R.id.clockView);
+//        clockView.startAnim();
+        setContentView(R.layout.activity_main);
 //        mCreditSesameRingView = (CreditSesameRingView)findViewById(R.id.creditSesameRingView);
 //        mCreditSesameRingView.setSesameValues(750);
 //        testView = (TextView)findViewById(R.id.textView);

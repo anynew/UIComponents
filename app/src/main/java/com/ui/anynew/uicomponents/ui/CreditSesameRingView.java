@@ -6,10 +6,14 @@ import android.content.Context;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -78,6 +82,9 @@ public class CreditSesameRingView extends View {
 
     //小圆点的实际位置
     private float[]  cir_location ;
+    private LinearGradient linearGradient;
+    private SweepGradient sw;
+    private RadialGradient mRadialGradient;
 
     public CreditSesameRingView(Context context) {
         this(context, null);
@@ -89,21 +96,34 @@ public class CreditSesameRingView extends View {
 
     public CreditSesameRingView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        disableHardwareRendering(this);
 
         defaultSize = dp2px(defaultSize);
         initPaint();
+    }
+    /**
+     *  关闭硬件加速
+     * @param v
+     */
+    public static void disableHardwareRendering(View v) {
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            v.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
     }
 
     /**
      * 初始化各种画笔
      */
     private void initPaint() {
+        BlurMaskFilter bmf = new BlurMaskFilter(10, BlurMaskFilter.Blur.SOLID);
+
         wPaint = new Paint();
         wPaint.setAntiAlias(true);
         wPaint.setColor(Color.WHITE);
         wPaint.setStyle(Paint.Style.STROKE);
         wPaint.setAlpha(50);
         wPaint.setStrokeWidth(10);
+        wPaint.setStrokeCap(Paint.Cap.ROUND);
 
         wwPaint=new Paint();
         wwPaint.setAntiAlias(true);
@@ -113,9 +133,9 @@ public class CreditSesameRingView extends View {
 
         nPaint = new Paint();
         nPaint.setAntiAlias(true);
-        nPaint.setColor(Color.WHITE);
+//        nPaint.setColor(Color.WHITE);
         nPaint.setStyle(Paint.Style.STROKE);
-        nPaint.setAlpha(50);
+//        nPaint.setAlpha(50);
         nPaint.setStrokeWidth(30);
 
         ltPaint = new Paint();
@@ -165,6 +185,7 @@ public class CreditSesameRingView extends View {
         mBitmapPaint.setStyle(Paint.Style.FILL);
         mBitmapPaint.setColor(Color.WHITE);
         mBitmapPaint.setAntiAlias(true);
+        mBitmapPaint.setMaskFilter(bmf);
 
         cir_location = new float[2];
     }
@@ -196,6 +217,17 @@ public class CreditSesameRingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        linearGradient = new LinearGradient(0,0,getMeasuredWidth(),0,new int[]{Color.parseColor("#008040"),Color.parseColor("#50AF61"),
+                Color.parseColor("#879F26"),Color.parseColor("#F5B944"),Color.parseColor("#F09964"),
+                Color.parseColor("#F9493C")},null, Shader.TileMode.CLAMP);
+
+        /*sw = new SweepGradient(radius, radius, new int[]{Color.parseColor("#008040"), Color.parseColor("#50AF61"),
+                Color.parseColor("#879F26"), Color.parseColor("#F5B944"), Color.parseColor("#F09964"),
+                Color.parseColor("#F9493C")}, null);*/
+
+
+        nPaint.setShader(mRadialGradient);
+        wwPaint.setShader(mRadialGradient);
         /***
          *
          * 绘制外环和内环
@@ -278,7 +310,7 @@ public class CreditSesameRingView extends View {
         path.addArc(rectF, -195, progress);
         PathMeasure pathMeasure = new PathMeasure(path, false);
         pathMeasure.getPosTan(pathMeasure.getLength() * 1, cir_location, null);
-        mBitmapPaint.setColor(Color.GREEN);
+//        mBitmapPaint.setColor(Color.GREEN);
         canvas.drawCircle(cir_location[0], cir_location[1], 8, mBitmapPaint);
         Log.e("Tag", "cir_location:[0] "+ cir_location[0] + " cir_location[1] :" + cir_location[1] );
     }

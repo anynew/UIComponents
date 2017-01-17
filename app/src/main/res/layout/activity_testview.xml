@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
     android:orientation="vertical">
 
     <com.ui.anynew.uicomponents.ui.TextView
@@ -26,12 +25,22 @@
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:padding="10dp"
-        app:LogoText="Anynew"
-        app:LogoTextDistance="50dp"
+        android:visibility="visible"
         app:CircleColor="@color/colorAccent"
         app:CircleWidth="2dp"
+        app:LogoText="Anynew"
+        app:LogoTextDistance="30dp"
         app:ScaleColor="@color/colorAccent"
         app:ScaleLength="13dp"
         app:ScaleWidth="3dp" />
+
+    <com.ui.anynew.uicomponents.ui.CircleColorBar
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:id="@+id/mCircle"
+        android:layout_width="300dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center" />
+
 
 </LinearLayout>
